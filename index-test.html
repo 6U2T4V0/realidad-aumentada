@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba RA</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-image-three.prod.js"></script>
+  <style>body{margin:0;}</style>
+</head>
+<body>
+<button id="startBtn">Abrir RA</button>
+<script>
+const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+  container: document.body,
+  imageTargetSrc: "targets.mind"
+});
+const {renderer, scene, camera} = mindarThree;
+const geometry = new THREE.BoxGeometry(0.5,0.5,0.5);
+const material = new THREE.MeshBasicMaterial({color:0x00ff00});
+const cube = new THREE.Mesh(geometry,material);
+const anchor = mindarThree.addAnchor(0);
+anchor.group.add(cube);
+const startBtn = document.getElementById("startBtn");
+startBtn.addEventListener("click", async ()=>{
+  startBtn.style.display="none";
+  await mindarThree.start();
+  renderer.setAnimationLoop(()=>renderer.render(scene,camera));
+});
+</script>
+</body>
+</html>
