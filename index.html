@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>RA con Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar/dist/mindar-image-three.prod.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    video { display: none; }
+    canvas { position: absolute; top: 0; left: 0; }
+  </style>
+</head>
+<body>
+  <!-- Video oculto -->
+  <video id="video" src="video.mp4" loop playsinline webkit-playsinline></video>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.body,
+        imageTargetSrc: "targets.mind"
+      });
+
+      const {renderer, scene, camera} = mindarThree;
+
+      // Plano para el video
+      const geometry = new THREE.PlaneGeometry(1, 0.56); // pantalla 16:9
+      const video = document.getElementById("video");
+      const texture = new THREE.VideoTexture(video);
+      const material = new THREE.MeshBasicMaterial({map: texture});
+      const plane = new THREE.Mesh(geometry, material);
+
+      // Anclar a la imagen detectada
+      const anchor = mindarThree.addAnchor(0);
+      anchor.group.add(plane);
+
+      // Evento: cuando se detecta la imagen, reproducir video
+      anchor.onTargetFound = () => {
+        video.play();
+      };
+
+      // Cuando se pierde la imagen, pausar
+      anchor.onTargetLost = () => {
+        video.pause();
+      };
+
+      // Iniciar
+      mindarThree.start();
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    });
+  </script>
+</body>
+</html>
